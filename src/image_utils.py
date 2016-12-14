@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 
 
 def read_images_from_mnist(file_path, normalize=True, whitenning=True):
-    """read image from mnist folder
+    """
+    Read image from mnist folder
 
     :param file_path: path for mnist cpickled file
     :param normalize:
@@ -59,8 +60,45 @@ def read_images_from_mnist(file_path, normalize=True, whitenning=True):
     return train_set, valid_set, test_set
 
 
+def read_images_from_cifar_10(file_path, normalize=True, whitenning=True):
+    """
+    Read images from cifar 10 folder and prepare the train set, valid set and test set
+
+    :param file_path: path for cifar 10 cpickled file
+    :param normalize:
+    :param whitenning:
+    :return: train_set (50k examples): [ [list of images], [list of labels related with each image]  ]
+    :return: valid_set (10k examples): [ [list of images], [list of labels related with each image]  ]
+    :return: test_set (10k examples): [ [list of images], [list of labels related with each image]  ]
+    """
+
+    train_set, valid_set, test_set = []
+
+    return train_set, valid_set, test_set
+
+
+def unpickle(file):
+    """
+    Unpickle a pickled python object that contains 10000 images and its labels
+
+    :param file: path to the file
+    :return: dict with two elements:
+        data: a 10000x3072 numpy array of uint8s. Each row of the array stores a 32x32 colour image.
+        The first 1024 entries contain the red channel values, the next 1024 the green, and the final 1024 the blue.
+        The image is stored in row-major order, so that the first 32 entries of the array are the red channel values
+        of the first row of the image.
+        label: a list of 10000 numbers in the range 0-9. The number at index i indicates the label of the
+        ith image in the array data.
+    """
+    fo = open(file, 'rb')
+    dict = cPickle.load(fo)
+    fo.close()
+    return dict
+
+
 def normalize_img(img):
-    """normalize values inside an image matrix
+    """
+    Normalize values inside an image matrix
 
     :param img: numpy array
     :return: img: numpy array
@@ -69,7 +107,8 @@ def normalize_img(img):
 
 
 def whitenning_img(img):
-    """remove content (filter) image using a sobel filter
+    """
+    Remove content (filter) image using a sobel filter
 
     :param img: numpy array
     :return: numpy array
@@ -78,7 +117,8 @@ def whitenning_img(img):
 
 
 def sampling_image(img, window_size=(5,5)):
-    """get a sample slice from a image
+    """
+    Get a sample slice from a image
 
     :param img: numpy array
     :param window_size: a tuple (width, height) with the sample size
@@ -90,7 +130,8 @@ def sampling_image(img, window_size=(5,5)):
 
 
 def generate_samples(data_set, num_samples, window_size=(5,5)):
-    """from a set of images, generate many samples (slices)
+    """
+    From a set of images, generate many samples (slices)
 
     :param data_set: numpy array with multiple images (each image is a numpy array)
     :param num_samples: number of samples that must be generated
@@ -107,7 +148,8 @@ def generate_samples(data_set, num_samples, window_size=(5,5)):
 
 
 def draw_multiple_images(images, num_lines, num_columns):
-    """draw multiple images (usually k-means centroids) in a grid
+    """
+    Draw multiple images (usually k-means centroids) in a grid
 
     :param images: numpy array with multiple images (each image is a numpy array)
     :param num_lines: number of lines in grid
@@ -136,7 +178,8 @@ def draw_multiple_images(images, num_lines, num_columns):
 
 
 def draw_img(img):
-    """ draw an image
+    """
+    Draw an image
 
     :param img: numpy array
     """
@@ -145,7 +188,8 @@ def draw_img(img):
 
 
 def convolve_image(img, filter):
-    """apply a filter over a image
+    """
+    Apply a filter over a image
 
     :param img: numpy array representing original image
     :param filter: numpy array representing the filter that will be apply
