@@ -8,7 +8,7 @@ def generate_cluster_centroids(data_set, window_size, num_cluster):
     """generate a set of centroids from image
 
     :param data_set: a numpy array of images (numpy array)
-    :param window_size: a tuple (width, height) with the sample size
+    :param window_size: int that will determinate a tuple (width, height) with the sample size
     :param num_cluster: the number of centroids that will be generated
     :return: centroids: numpy array with the k-means generated centroids
     """
@@ -22,7 +22,7 @@ def generate_cluster_centroids(data_set, window_size, num_cluster):
     samples = generate_samples(X, 10000, window_size=(window_size,window_size))
 
     # FITTING K-MEANS
-    kmeans_model =  MiniBatchKMeans(n_clusters=num_cluster, batch_size=100, n_init=10, max_no_improvement=10, verbose=False)
+    kmeans_model = MiniBatchKMeans(n_clusters=num_cluster, batch_size=100, n_init=10, max_no_improvement=10, verbose=False)
     kmeans_model.fit(samples)
 
     centroids = kmeans_model.cluster_centers_
@@ -41,10 +41,10 @@ def run():
     centroids = generate_cluster_centroids(train_set, window_centroids_size, num_cluster)
 
     # drawing the grid with centroids
-    draw_multiple_images(centroids,4,4)
+    draw_multiple_images(centroids, 4, 4)
 
     # filtering and drawing a image
-    filtered = convolve_image(train_set[0][0].reshape(28,28), centroids[0].reshape(5,5))
+    filtered = convolve_image(train_set[0][0].reshape(28, 28), centroids[0].reshape(5, 5))
     draw_img(filtered)
 
 
