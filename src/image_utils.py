@@ -23,7 +23,7 @@ def read_images_from_mnist(file_path, normalize=True, whitenning=True):
     train_set, valid_set, test_set = cPickle.load(f)
     f.close()
 
-    for i in range(len(train_set[0])):
+    for i in xrange(len(train_set[0])):
         img = np.array(train_set[0][i]).reshape(28,28)
 
         if normalize:
@@ -34,7 +34,7 @@ def read_images_from_mnist(file_path, normalize=True, whitenning=True):
 
         train_set[0][i] = img.reshape(784)
 
-    for i in range(len(valid_set[0])):
+    for i in xrange(len(valid_set[0])):
         img = np.array(valid_set[0][i]).reshape(28,28)
 
         if normalize:
@@ -45,7 +45,7 @@ def read_images_from_mnist(file_path, normalize=True, whitenning=True):
 
         valid_set[0][i] = img.reshape(784)
 
-    for i in range(len(test_set[0])):
+    for i in xrange(len(test_set[0])):
         img = np.array(test_set[0][i]).reshape(28,28)
 
         if normalize:
@@ -98,7 +98,7 @@ def generate_samples(data_set, num_samples, window_size=(5,5)):
     :return: img: numpy array with multiple image samples
     """
     samples = []
-    for i in range(num_samples):
+    for i in xrange(num_samples):
         random_img_posi = np.random.randint(0, len(data_set))
         img = data_set[random_img_posi]
         sample = sampling_image(img.reshape(28,28), window_size=window_size )
@@ -117,8 +117,8 @@ def draw_multiple_images(images, num_lines, num_columns):
     img_is_flatten = True if len(images[0].shape) == 1 else False
 
     fig, subs = plt.subplots(num_lines, num_columns)
-    for i in range(num_lines):
-        for j in range(num_columns):
+    for i in xrange(num_lines):
+        for j in xrange(num_columns):
             img = images[i*j]
 
             if img_is_flatten:

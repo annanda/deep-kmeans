@@ -3,6 +3,7 @@ from sklearn.metrics import silhouette_score
 
 from image_utils import *
 
+
 def generate_cluster_centroids(data_set, window_size, num_cluster):
     """generate a set of centroids from image
 
