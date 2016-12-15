@@ -25,7 +25,7 @@ def read_images_from_mnist(file_path, normalize=True, whitenning=True):
     f.close()
 
     for i in xrange(len(train_set[0])):
-        img = np.array(train_set[0][i]).reshape(28,28)
+        img = np.array(train_set[0][i]).reshape(28, 28)
 
         if normalize:
             img = normalize_img(img)
@@ -36,7 +36,7 @@ def read_images_from_mnist(file_path, normalize=True, whitenning=True):
         train_set[0][i] = img.reshape(784)
 
     for i in xrange(len(valid_set[0])):
-        img = np.array(valid_set[0][i]).reshape(28,28)
+        img = np.array(valid_set[0][i]).reshape(28, 28)
 
         if normalize:
             img = normalize_img(img)
@@ -47,7 +47,7 @@ def read_images_from_mnist(file_path, normalize=True, whitenning=True):
         valid_set[0][i] = img.reshape(784)
 
     for i in xrange(len(test_set[0])):
-        img = np.array(test_set[0][i]).reshape(28,28)
+        img = np.array(test_set[0][i]).reshape(28, 28)
 
         if normalize:
             img = normalize_img(img)
@@ -67,14 +67,57 @@ def read_images_from_cifar_10(file_path, normalize=True, whitenning=True):
     :param file_path: path for cifar 10 cpickled file
     :param normalize:
     :param whitenning:
-    :return: train_set (50k examples): [ [list of images], [list of labels related with each image]  ]
-    :return: valid_set (10k examples): [ [list of images], [list of labels related with each image]  ]
-    :return: test_set (10k examples): [ [list of images], [list of labels related with each image]  ]
+    :return: train_set (8k examples): numpy ndarray with shape (8000, 2). row[i][0] = [image], row[i][1] = label
+    :return: valid_set (2k examples): numpy ndarray with shape (2000, 2). row[i][0] = [image], row[i][1] = label
+    :return: test_set (2k examples): numpy ndarray with shape (2000, 2). row[i][0] = [image], row[i][1] = label
     """
+    train_dict = unpickle(file_path + 'data_batch_1')
 
-    train_set, valid_set, test_set = []
+    test_dict = unpickle(file_path + 'test_batch')
+
+    classe_1_train = train_dict['data'][:4000]
+    classe_1_valid = train_dict['data'][4000:5000]
+    classe_2_train = train_dict['data'][5000:9000]
+    classe_2_valid = train_dict['data'][9000:]
+
+    classe_1_train_label = train_dict['labels'][:4000]
+    classe_1_valid_label = train_dict['labels'][4000:5000]
+    classe_2_train_label = train_dict['labels'][5000:9000]
+    classe_2_valid_label = train_dict['labels'][9000:]
+
+    train = np.append(classe_1_train, classe_2_train, axis=0)
+    train_label = np.append(classe_1_train_label, classe_2_train_label, axis=0)
+    # make association between each image with its label
+    train_and_label = zip(train, train_label)
+    train_set = np.array(list(train_and_label))
+
+    valid_set = np.append(classe_1_valid, classe_2_valid, axis=0)
+    valid_label = np.append(classe_1_valid_label, classe_2_valid_label, axis=0)
+    # make association between each image with its label
+    valid_set = zip(valid_set, valid_label)
+    valid_set = np.array(list(valid_set))
+
+    test_dict['data'] = test_dict['data'][2000:4000]
+    test_dict['labels'] = test_dict['labels'][2000:4000]
+    test_set = dic_to_array(test_dict)
 
     return train_set, valid_set, test_set
+
+
+def dic_to_array(dic):
+    """
+    Transform dictionary which keys are data and label into an array
+    :param dic:dictionary which keys are data and label.
+            data has the image and label has the class which that image belong to.
+    :return: array: numpy ndarray which shape is (3072, 2) that contains
+    """
+    list_images = dic['data']
+    list_labels = dic['labels']
+    # make association between each image with its label
+    array = zip(list_images, list_labels)
+    array = np.array(list(array))
+
+    return array
 
 
 def unpickle(file):
@@ -113,10 +156,10 @@ def whitenning_img(img):
     :param img: numpy array
     :return: numpy array
     """
-    return cv2.Sobel(img,cv2.CV_32F,1,1,ksize=5)
+    return cv2.Sobel(img, cv2.CV_32F, 1, 1, ksize=5)
 
 
-def sampling_image(img, window_size=(5,5)):
+def sampling_image(img, window_size=(5, 5)):
     """
     Get a sample slice from a image
 
@@ -126,10 +169,10 @@ def sampling_image(img, window_size=(5,5)):
     """
     x = np.random.randint(0, img.shape[0]-window_size[0])
     y = np.random.randint(0, img.shape[1]-window_size[1])
-    return img[x : x + window_size[0], y: y + window_size[1]].flatten()
+    return img[x: x + window_size[0], y: y + window_size[1]].flatten()
 
 
-def generate_samples(data_set, num_samples, window_size=(5,5)):
+def generate_samples(data_set, num_samples, window_size=(5, 5)):
     """
     From a set of images, generate many samples (slices)
 
@@ -142,7 +185,7 @@ def generate_samples(data_set, num_samples, window_size=(5,5)):
     for i in xrange(num_samples):
         random_img_posi = np.random.randint(0, len(data_set))
         img = data_set[random_img_posi]
-        sample = sampling_image(img.reshape(28,28), window_size=window_size )
+        sample = sampling_image(img.reshape(28, 28), window_size=window_size)
         samples.append(sample)
     return np.array(samples)
 
@@ -183,7 +226,7 @@ def draw_img(img):
 
     :param img: numpy array
     """
-    plt.imshow(img, cmap='Greys_r')
+    plt.imshow(img)
     plt.show()
 
 
@@ -196,3 +239,18 @@ def convolve_image(img, filter):
     :return: img: numpy array with a filtered image
     """
     return cv2.filter2D(img, -1, filter)
+
+
+def un_flatten(img_flatten):
+    """
+    Transform a flattened image in its matrix form with rgb channels
+    :param img_flatten: numpy ndarray with shape (3072,) it is one image
+    :return: img numpy ndarray with shape (32, 32, 3) that is the image in matrix representation
+    """
+    img = img_flatten.reshape(3, 1024)
+    r, g, b = img[0], img[1], img[2]
+    r = r.reshape(32, 32)
+    g = g.reshape(32, 32)
+    b = b.reshape(32, 32)
+    img = cv2.merge((b, g, r))
+    return img
