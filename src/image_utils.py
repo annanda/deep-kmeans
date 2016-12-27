@@ -220,6 +220,17 @@ def draw_multiple_images(images, num_lines, num_columns):
     plt.show()
 
 
+def get_label_names(idx):
+    """
+    Return the name of label related to the index number
+    :param idx: indice number that whant to know the label of class
+    :return: label of class
+    """
+    fo = open('../cifar-10/batches.meta', 'rb')
+    lista = cPickle.load(fo)
+    return lista['label_names'][idx]
+
+
 def draw_img(img):
     """
     Draw an image
@@ -241,7 +252,7 @@ def convolve_image(img, filter):
     return cv2.filter2D(img, -1, filter)
 
 
-def un_flatten(img_flatten):
+def unflatten(img_flatten):
     """
     Transform a flattened image in its matrix form with rgb channels
     :param img_flatten: numpy ndarray with shape (3072,) it is one image
