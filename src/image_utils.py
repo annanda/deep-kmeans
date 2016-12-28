@@ -132,7 +132,7 @@ def normalize_img(img):
     :param img: numpy array
     :return: img: numpy array
     """
-    return cv2.normalize(img, img, alpha=0.0, beta=1.0, norm_type=cv2.NORM_MINMAX)
+    return cv2.normalize(img, img, alpha=0.0, beta=1.0, dtype=3, norm_type=cv2.NORM_MINMAX)
 
 
 def whitenning_img(img):
