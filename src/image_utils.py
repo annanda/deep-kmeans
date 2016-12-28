@@ -240,6 +240,17 @@ def get_index_from_name_label(label):
             return i
 
 
+def get_some_class(list_files, class_name):
+    final_array = []
+    for file in list_files:
+        dict = unpickle('../cifar-10/' + file)
+        example_list = dic_to_array(dict)
+        for example in example_list:
+            if example[1] == get_index_from_name_label(class_name):
+                final_array.append(example)
+    return final_array
+
+
 def draw_img(img):
     """
     Draw an image
