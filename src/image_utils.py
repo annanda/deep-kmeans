@@ -67,9 +67,9 @@ def read_images_from_cifar_10(file_path, normalize=True, whitenning=True):
     :param file_path: path for cifar 10 cpickled file
     :param normalize:
     :param whitenning:
-    :return: train_set (8k examples): numpy ndarray with shape (8000, 2). row[i][0] = [image], row[i][1] = label
-    :return: valid_set (2k examples): numpy ndarray with shape (2000, 2). row[i][0] = [image], row[i][1] = label
-    :return: test_set (2k examples): numpy ndarray with shape (2000, 2). row[i][0] = [image], row[i][1] = label
+    :return: train_set (8k examples from two classes): numpy ndarray with shape (8000, 2). row[i][0] = [image], row[i][1] = label
+    :return: valid_set (2k examples from two classes): numpy ndarray with shape (2000, 2). row[i][0] = [image], row[i][1] = label
+    :return: test_set (2k examples from two classes): numpy ndarray with shape (2000, 2). row[i][0] = [image], row[i][1] = label
     """
     train_dict = unpickle(file_path + 'data_batch_1')
 
@@ -229,6 +229,15 @@ def get_label_names(idx):
     fo = open('../cifar-10/batches.meta', 'rb')
     lista = cPickle.load(fo)
     return lista['label_names'][idx]
+
+
+def get_index_from_name_label(label):
+    fo = open('../cifar-10/batches.meta', 'rb')
+    lista = cPickle.load(fo)
+    lista = lista['label_names']
+    for i, elem in enumerate(lista):
+        if elem == label:
+            return i
 
 
 def draw_img(img):
