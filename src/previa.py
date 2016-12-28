@@ -59,6 +59,21 @@ def read_images_from_cifar_10(data_files, test_files, normalize=True, whitenning
     bird_test = get_some_class(test_files, 'bird')
     test_set.extend(bird_test)
 
+    for img in train_set:
+        img_unflatted = unflatten(img[0])
+        img_normalized = normalize_img(img_unflatted)
+        img[0] = flatten_img(img_normalized)
+
+    for img_1 in valid_set:
+        img_unflatted = unflatten(img_1[0])
+        img_normalized = normalize_img(img_unflatted)
+        img_1[0] = flatten_img(img_normalized)
+
+    for img_2 in test_set:
+        img_unflatted = unflatten(img_2[0])
+        img_normalized = normalize_img(img_unflatted)
+        img_2[0] = flatten_img(img_normalized)
+
     return train_set, valid_set, test_set
 
 
@@ -154,18 +169,35 @@ def get_index_from_name_label(label):
             return i
 
 
+def flatten_img(img):
+    b, g, r = cv2.split(img)
+    b = b.reshape(1024)
+    g = g.reshape(1024)
+    r = r.reshape(1024)
+    b = list(b)
+    g = list(g)
+    r = list(r)
+    img = r + g + b
+    return np.array(img)
+
 def run():
     data_files = ['data_batch_1', 'data_batch_2', 'data_batch_3', 'data_batch_4', 'data_batch_5']
     test_files = ['test_batch']
     train_set, valid_set, test_set = read_images_from_cifar_10(data_files, test_files)
-    img_1 = train_set[5000][0]
+    img_1 = train_set[10][0]
     img = unflatten(img_1)
-    # draw_img(img)
-    img_2 = test_set[1500][0]
+    draw_img(img)
+    img_2 = test_set[100][0]
     img_2 = unflatten(img_2)
     draw_img(img_2)
-    normalized = normalize_img(img_2)
-    draw_img(normalized)
+    # normalized = normalize_img(img_2)
+    # draw_img(normalized)
+    # img_nova = flatten_img(normalized)
+    # print len(img_nova)
+    # print img_nova
+    # print type(img_nova)
+    # oi = unflatten(img_nova)
+    # draw_img(oi)
 
 
 if __name__ == '__main__':
