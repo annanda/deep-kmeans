@@ -60,46 +60,32 @@ def read_images_from_mnist(file_path, normalize=True, whitenning=True):
     return train_set, valid_set, test_set
 
 
-def read_images_from_cifar_10(file_path, normalize=True, whitenning=True):
+def read_images_from_cifar_10(data_files, test_files, normalize=True, whitenning=True):
     """
     Read images from cifar 10 folder and prepare the train set, valid set and test set
 
-    :param file_path: path for cifar 10 cpickled file
+    :param data_files: list of Strings that contains the names of cifar data files
+    :param test_files: list of Strings that contains the names of cifar test files
     :param normalize:
     :param whitenning:
     :return: train_set (8k examples from two classes): numpy ndarray with shape (8000, 2). row[i][0] = [image], row[i][1] = label
     :return: valid_set (2k examples from two classes): numpy ndarray with shape (2000, 2). row[i][0] = [image], row[i][1] = label
     :return: test_set (2k examples from two classes): numpy ndarray with shape (2000, 2). row[i][0] = [image], row[i][1] = label
     """
-    train_dict = unpickle(file_path + 'data_batch_1')
 
-    test_dict = unpickle(file_path + 'test_batch')
+    cat_class = get_some_class(data_files, 'cat')
+    train_set = cat_class[:4000]
+    valid_set = cat_class[4000:]
 
-    classe_1_train = train_dict['data'][:4000]
-    classe_1_valid = train_dict['data'][4000:5000]
-    classe_2_train = train_dict['data'][5000:9000]
-    classe_2_valid = train_dict['data'][9000:]
+    bird_class = get_some_class(data_files, 'bird')
+    train_set.extend(bird_class[:4000])
+    valid_set.extend((bird_class[4000:]))
 
-    classe_1_train_label = train_dict['labels'][:4000]
-    classe_1_valid_label = train_dict['labels'][4000:5000]
-    classe_2_train_label = train_dict['labels'][5000:9000]
-    classe_2_valid_label = train_dict['labels'][9000:]
+    cat_test = get_some_class(test_files, 'cat')
+    test_set = cat_test
 
-    train = np.append(classe_1_train, classe_2_train, axis=0)
-    train_label = np.append(classe_1_train_label, classe_2_train_label, axis=0)
-    # make association between each image with its label
-    train_and_label = zip(train, train_label)
-    train_set = np.array(list(train_and_label))
-
-    valid_set = np.append(classe_1_valid, classe_2_valid, axis=0)
-    valid_label = np.append(classe_1_valid_label, classe_2_valid_label, axis=0)
-    # make association between each image with its label
-    valid_set = zip(valid_set, valid_label)
-    valid_set = np.array(list(valid_set))
-
-    test_dict['data'] = test_dict['data'][2000:4000]
-    test_dict['labels'] = test_dict['labels'][2000:4000]
-    test_set = dic_to_array(test_dict)
+    bird_test = get_some_class(test_files, 'bird')
+    test_set.extend(bird_test)
 
     return train_set, valid_set, test_set
 
