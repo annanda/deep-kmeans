@@ -145,20 +145,13 @@ def get_index_from_name_label(label):
 
 
 def run():
-    # train_set, valid_set, test_set = read_images_from_cifar_10('../cifar-10/')
-    # target = train_set[0][1]
-    # classes = ['airplane', 'automobile', 'bird', 'cat', 'deer', '']
-    # examples_cats = get_class_1('airplane')
-    # print len(examples_cats)
-    # img_1 = examples_cats[0][0]
-    # img = unflatten(img_1)
-    # draw_img(img)
     data_files = ['data_batch_1', 'data_batch_2', 'data_batch_3', 'data_batch_4', 'data_batch_5']
     test_files = ['test_batch']
     train_set, valid_set, test_set = read_images_from_cifar_10(data_files, test_files)
-    print len(train_set)
-    print len(valid_set)
-    print len(test_set)
+    img_1 = train_set[5000][0]
+    img = unflatten(img_1)
+    draw_img(img)
+
 
 if __name__ == '__main__':
     run()
