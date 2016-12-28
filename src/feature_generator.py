@@ -32,8 +32,10 @@ def generate_cluster_centroids(data_set, window_size, num_cluster):
 
 def run():
 
-    # train_set, valid_set, test_set = read_images_from_mnist("../mnist/mnist.pkl.gz")
-    train_set, valid_set, test_set = read_images_from_cifar_10("../cifar-10/")
+    data_files = ['data_batch_1', 'data_batch_2', 'data_batch_3', 'data_batch_4', 'data_batch_5']
+    test_files = ['test_batch']
+
+    train_set, valid_set, test_set = read_images_from_cifar_10(data_files, test_files)
 
     window_centroids_size = 5
     num_cluster = 2
