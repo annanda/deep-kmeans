@@ -73,6 +73,16 @@ def get_some_class(list_files, class_name):
     return final_array
 
 
+def normalize_img(img):
+    """
+    Normalize values inside an image matrix
+
+    :param img: numpy array
+    :return: img: numpy array
+    """
+    return cv2.normalize(img, img, alpha=0.0, beta=1.0, dtype=3, norm_type=cv2.NORM_MINMAX)
+
+
 def draw_multiple_images(images, num_lines, num_columns):
     """
     Draw multiple images (usually k-means centroids) in a grid
@@ -150,10 +160,12 @@ def run():
     train_set, valid_set, test_set = read_images_from_cifar_10(data_files, test_files)
     img_1 = train_set[5000][0]
     img = unflatten(img_1)
-    draw_img(img)
+    # draw_img(img)
     img_2 = test_set[1500][0]
     img_2 = unflatten(img_2)
     draw_img(img_2)
+    normalized = normalize_img(img_2)
+    draw_img(normalized)
 
 
 if __name__ == '__main__':
