@@ -151,6 +151,9 @@ def run():
     img_1 = train_set[5000][0]
     img = unflatten(img_1)
     draw_img(img)
+    img_2 = test_set[1500][0]
+    img_2 = unflatten(img_2)
+    draw_img(img_2)
 
 
 if __name__ == '__main__':
