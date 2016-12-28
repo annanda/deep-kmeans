@@ -62,16 +62,19 @@ def read_images_from_cifar_10(data_files, test_files, normalize=True, whitenning
     for img in train_set:
         img_unflatted = unflatten(img[0])
         img_normalized = normalize_img(img_unflatted)
-        img[0] = flatten_img(img_normalized)
+        img_whitened = apply_zca_in_image(img_normalized)
+        img[0] = flatten_img(img_whitened)
 
     for img_1 in valid_set:
         img_unflatted = unflatten(img_1[0])
         img_normalized = normalize_img(img_unflatted)
-        img_1[0] = flatten_img(img_normalized)
+        img_whitened = apply_zca_in_image(img_normalized)
+        img_1[0] = flatten_img(img_whitened)
 
     for img_2 in test_set:
         img_unflatted = unflatten(img_2[0])
         img_normalized = normalize_img(img_unflatted)
+        # img_whitened = apply_zca_in_image(img_normalized)
         img_2[0] = flatten_img(img_normalized)
 
     return train_set, valid_set, test_set
@@ -180,16 +183,54 @@ def flatten_img(img):
     img = r + g + b
     return np.array(img)
 
+
+def zca_whitening_matrix(X):
+    """
+    Function to compute ZCA whitening matrix (aka Mahalanobis whitening).
+    INPUT:  X: [M x N] matrix.
+        Rows: Variables
+        Columns: Observations
+    OUTPUT: ZCAMatrix: [M x M] matrix
+    """
+    # Covariance matrix [column-wise variables]: Sigma = (X-mu)' * (X-mu) / N
+    sigma = np.cov(X, rowvar=True) # [M x M]
+    # Singular Value Decomposition. X = U * np.diag(S) * V
+    U,S,V = np.linalg.svd(sigma)
+        # U: [M x M] eigenvectors of sigma.
+        # S: [M x 1] eigenvalues of sigma.
+        # V: [M x M] transpose of U
+    # Whitening constant: prevents division by zero
+    epsilon = 1e-5
+    # ZCA Whitening matrix: U * Lambda * U'
+    ZCAMatrix = np.dot(U, np.dot(np.diag(1.0/np.sqrt(S + epsilon)), U.T)) # [M x M]
+    return ZCAMatrix
+
+
+def apply_zca_in_image(img):
+    """
+    Apply whitenning ZCA in an image
+    :param img: nparray that is the image with three channels
+    :return: nparray that is the image with three channels and whitened
+    """
+    b, g, r = cv2.split(img)
+    b = zca_whitening_matrix(b)
+    g = zca_whitening_matrix(g)
+    r = zca_whitening_matrix(r)
+
+    img = cv2.merge((b, g, r))
+    return img
+
+
 def run():
     data_files = ['data_batch_1', 'data_batch_2', 'data_batch_3', 'data_batch_4', 'data_batch_5']
     test_files = ['test_batch']
     train_set, valid_set, test_set = read_images_from_cifar_10(data_files, test_files)
-    img_1 = train_set[10][0]
-    img = unflatten(img_1)
-    draw_img(img)
-    img_2 = test_set[100][0]
+    img_2 = test_set[0][0]
     img_2 = unflatten(img_2)
     draw_img(img_2)
+    img_1 = train_set[100][0]
+    img = unflatten(img_1)
+    draw_img(img)
     # normalized = normalize_img(img_2)
     # draw_img(normalized)
     # img_nova = flatten_img(normalized)
