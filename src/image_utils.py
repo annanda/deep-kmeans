@@ -232,6 +232,11 @@ def get_label_names(idx):
 
 
 def get_index_from_name_label(label):
+    """
+    Return the index of specific class name
+    :param label: String name of the class
+    :return: Inteiro index of class
+    """
     fo = open('../cifar-10/batches.meta', 'rb')
     lista = cPickle.load(fo)
     lista = lista['label_names']
@@ -241,6 +246,12 @@ def get_index_from_name_label(label):
 
 
 def get_some_class(list_files, class_name):
+    """
+    Return exemples of a specific class
+    :param list_files: list of Strings that contains the names of cifar data files.
+    :param class_name: String the name of desired class
+    :return: List of examples and target label that are from this class
+    """
     final_array = []
     for file in list_files:
         dict = unpickle('../cifar-10/' + file)
@@ -254,7 +265,6 @@ def get_some_class(list_files, class_name):
 def draw_img(img):
     """
     Draw an image
-
     :param img: numpy array
     """
     plt.imshow(img)
