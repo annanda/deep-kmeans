@@ -87,6 +87,21 @@ def read_images_from_cifar_10(data_files, test_files, normalize=True, whitenning
     bird_test = get_some_class(test_files, 'bird')
     test_set.extend(bird_test)
 
+    for img in train_set:
+        img_unflatted = unflatten(img[0])
+        img_normalized = normalize_img(img_unflatted)
+        img[0] = flatten_img(img_normalized)
+
+    for img_1 in valid_set:
+        img_unflatted = unflatten(img_1[0])
+        img_normalized = normalize_img(img_unflatted)
+        img_1[0] = flatten_img(img_normalized)
+
+    for img_2 in test_set:
+        img_unflatted = unflatten(img_2[0])
+        img_normalized = normalize_img(img_unflatted)
+        img_2[0] = flatten_img(img_normalized)
+
     return train_set, valid_set, test_set
 
 
@@ -281,3 +296,20 @@ def unflatten(img_flatten):
     b = b.reshape(32, 32)
     img = cv2.merge((b, g, r))
     return img
+
+
+def flatten_img(img):
+    """
+    Flatten an image as a numpyarray of shape (3072,)
+    :param img: image that will be flatted, numpyarray of shape (32, 32, 3)
+    :return: numpyarray [R channel, G channel, B channel]
+    """
+    b, g, r = cv2.split(img)
+    b = b.reshape(1024)
+    g = g.reshape(1024)
+    r = r.reshape(1024)
+    b = list(b)
+    g = list(g)
+    r = list(r)
+    img = r + g + b
+    return np.array(img)
