@@ -1,8 +1,20 @@
-import cv2
 import cPickle
-import gzip
-import numpy as np
+import time
+
+import cv2
 import matplotlib.pyplot as plt
+import numpy as np
+
+LABEL_AIRPLANE = 0
+LABEL_AUTOMOBILE = 1
+LABEL_BIRD = 2
+LABEL_CAT = 3
+LABEL_DEER = 4
+LABEL_DOG = 5
+LABEL_FROG = 6
+LABEL_HORSE = 7
+LABEL_SHIP = 8
+LABEL_TRUCK = 9
 
 
 def unpickle(file):
@@ -23,6 +35,7 @@ def unpickle(file):
     fo.close()
     return dict
 
+
 def dic_to_array(dic):
     list_images = dic['data']
     list_labels = dic['labels']
@@ -31,6 +44,14 @@ def dic_to_array(dic):
     array = np.array(list(array))
 
     return array
+
+
+def start_timer(name=None):
+    if name is None:
+        start_timer.start = time.time()
+    else:
+        end = time.time()
+        print("Benchmark {} took: {} seconds.".format(name, end - start_timer.start))
 
 
 def read_images_from_cifar_10(data_files, test_files, normalize=True, whitenning=True):
@@ -45,18 +66,18 @@ def read_images_from_cifar_10(data_files, test_files, normalize=True, whitenning
     :return: test_set (2k examples): numpy ndarray shape(2000, 2). row[i][0] = [image], row[i][1] = label
     """
 
-    cat_class = get_some_class(data_files, 'cat')
+    cat_class = get_some_class(data_files, LABEL_CAT)
     train_set = cat_class[:4000]
     valid_set = cat_class[4000:]
 
-    bird_class = get_some_class(data_files, 'bird')
+    bird_class = get_some_class(data_files, LABEL_BIRD)
     train_set.extend(bird_class[:4000])
     valid_set.extend((bird_class[4000:]))
 
-    cat_test = get_some_class(test_files, 'cat')
+    cat_test = get_some_class(test_files, LABEL_CAT)
     test_set = cat_test
 
-    bird_test = get_some_class(test_files, 'bird')
+    bird_test = get_some_class(test_files, LABEL_BIRD)
     test_set.extend(bird_test)
 
     for img in train_set:
@@ -83,11 +104,15 @@ def read_images_from_cifar_10(data_files, test_files, normalize=True, whitenning
 def get_some_class(list_files, class_name):
     final_array = []
     for file in list_files:
+
         dict = unpickle('../cifar-10/' + file)
+
         example_list = dic_to_array(dict)
+
         for example in example_list:
-            if example[1] == get_index_from_name_label(class_name):
+            if example[1] == class_name:
                 final_array.append(example)
+
     return final_array
 
 
@@ -115,7 +140,7 @@ def draw_multiple_images(images, num_lines, num_columns):
     fig, subs = plt.subplots(num_lines, num_columns)
     for i in xrange(num_lines):
         for j in xrange(num_columns):
-            img = images[i*j]
+            img = images[i * j]
 
             if img_is_flatten:
 
@@ -163,15 +188,6 @@ def get_label_names(idx):
     return lista['label_names'][idx]
 
 
-def get_index_from_name_label(label):
-    fo = open('../cifar-10/batches.meta', 'rb')
-    lista = cPickle.load(fo)
-    lista = lista['label_names']
-    for i, elem in enumerate(lista):
-        if elem == label:
-            return i
-
-
 def flatten_img(img):
     b, g, r = cv2.split(img)
     b = b.reshape(1024)
@@ -193,16 +209,16 @@ def zca_whitening_matrix(X):
     OUTPUT: ZCAMatrix: [M x M] matrix
     """
     # Covariance matrix [column-wise variables]: Sigma = (X-mu)' * (X-mu) / N
-    sigma = np.cov(X, rowvar=True) # [M x M]
+    sigma = np.cov(X, rowvar=True)  # [M x M]
     # Singular Value Decomposition. X = U * np.diag(S) * V
-    U,S,V = np.linalg.svd(sigma)
-        # U: [M x M] eigenvectors of sigma.
-        # S: [M x 1] eigenvalues of sigma.
-        # V: [M x M] transpose of U
+    U, S, V = np.linalg.svd(sigma)
+    # U: [M x M] eigenvectors of sigma.
+    # S: [M x 1] eigenvalues of sigma.
+    # V: [M x M] transpose of U
     # Whitening constant: prevents division by zero
     epsilon = 1e-5
     # ZCA Whitening matrix: U * Lambda * U'
-    ZCAMatrix = np.dot(U, np.dot(np.diag(1.0/np.sqrt(S + epsilon)), U.T)) # [M x M]
+    ZCAMatrix = np.dot(U, np.dot(np.diag(1.0 / np.sqrt(S + epsilon)), U.T))  # [M x M]
     return ZCAMatrix
 
 
