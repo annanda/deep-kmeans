@@ -83,14 +83,14 @@ def read_images_from_cifar_10(data_files, test_files, normalize=True, whitenning
     for img in train_set:
         img_unflatted = unflatten(img[0])
         img_normalized = normalize_img(img_unflatted)
-        img_whitened = apply_zca_in_image(img_normalized)
-        img[0] = flatten_img(img_whitened)
+        # img_whitened = apply_zca_in_image(img_normalized)
+        img[0] = flatten_img(img_normalized)
 
     for img_1 in valid_set:
         img_unflatted = unflatten(img_1[0])
         img_normalized = normalize_img(img_unflatted)
-        img_whitened = apply_zca_in_image(img_normalized)
-        img_1[0] = flatten_img(img_whitened)
+        # img_whitened = apply_zca_in_image(img_normalized)
+        img_1[0] = flatten_img(img_normalized)
 
     for img_2 in test_set:
         img_unflatted = unflatten(img_2[0])
