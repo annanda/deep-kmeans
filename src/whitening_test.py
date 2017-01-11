@@ -7,6 +7,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import linalg
+from sklearn.decomposition import PCA
 
 
 def draw_img(img):
@@ -78,9 +79,9 @@ def whitenning(img):
     :return: nparray that is the image with three channels and whitened
     """
     b, g, r = cv2.split(img)
-    bw = pca_white(b)
-    gw = pca_white(g)
-    rw = pca_white(r)
+    bw = pca_scikit(b)
+    gw = pca_scikit(g)
+    rw = pca_scikit(r)
 
     img = cv2.merge((bw, gw, rw))
     return img
@@ -135,6 +136,12 @@ def pca_white(x):
     # plt.title('xPCAWhite')
     # plt.show()
     return  xZCAWhite
+
+def pca_scikit(x):
+    pca = PCA(whiten=True)
+    pca.fit(x)
+    pca.transform(x)
+    return x
 
 img_path = "../girl-original.png"
 imgw_path = "../girl-whitened.png"
