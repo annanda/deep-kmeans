@@ -165,8 +165,8 @@ def generate_samples(data_set, num_samples, window_size=(5, 5)):
     samples = []
     for i in xrange(num_samples):
         random_img_posi = np.random.randint(0, len(data_set))
-        img = data_set[random_img_posi]
-        sample = sampling_image(img.reshape(28, 28), window_size=window_size)
+        img = data_set[random_img_posi][0][0:1024]
+        sample = sampling_image(img.reshape(32, 32), window_size=window_size)
         samples.append(sample)
     return np.array(samples)
 
@@ -272,7 +272,11 @@ def draw_images_with_matplot(image_matrix):
         for j in xrange(num_columns):
             img = image_matrix[i][j]
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            subs[i][j].imshow(img, cmap='Greys_r')
-            subs[i][j].axis('off')
+            if num_lines == 1:
+                subs[j].imshow(img, cmap='Greys_r')
+                subs[j].axis('off')
+            else:
+                subs[i][j].imshow(img, cmap='Greys_r')
+                subs[i][j].axis('off')
 
     plt.show()

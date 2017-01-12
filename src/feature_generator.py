@@ -12,13 +12,13 @@ def generate_cluster_centroids(data_set, window_size, num_cluster):
     :return: centroids: numpy array with the k-means generated centroids
     """
 
-    X = np.array(data_set[0])
-    y = data_set[1]
+    X = np.array(data_set)
+    # y = data_set[1]
 
-    sqrt_num_cluster = int(np.sqrt(num_cluster))
+    # sqrt_num_cluster = int(np.sqrt(num_cluster))
 
     #  GENERATING SAMPLES
-    samples = generate_samples(X, 10000, window_size=(window_size,window_size))
+    samples = generate_samples(X, 10000, window_size=(window_size, window_size))
 
     # FITTING K-MEANS
     kmeans_model = MiniBatchKMeans(n_clusters=num_cluster, batch_size=100, n_init=10, max_no_improvement=10, verbose=False)
@@ -36,18 +36,25 @@ def run():
 
     train_set, valid_set, test_set = read_images_from_cifar_10(data_files, test_files)
 
-    window_centroids_size = 5
-    num_cluster = 2
+    window_centroids_size = 15
+    num_cluster = 5
 
-    # creating centroids from mnist
+    # creating centroids from cifar 10
     centroids = generate_cluster_centroids(train_set, window_centroids_size, num_cluster)
 
     # drawing the grid with centroids
-    draw_multiple_images(centroids, 4, 4)
+    images = []
+    for centroid in centroids:
+        channel = centroid.reshape(window_centroids_size, window_centroids_size)
+        empty_channel = np.zeros(shape=(window_centroids_size, window_centroids_size))
+        image = cv2.merge((empty_channel, channel, empty_channel))
+        images.append(image)
+
+        draw_image(image, "Centroid")
 
     # filtering and drawing a image
-    filtered = convolve_image(train_set[0][0].reshape(28, 28), centroids[0].reshape(5, 5))
-    draw_image(filtered)
+        # filtered = convolve_image(train_set[0][0].reshape(28, 28), centroids[0].reshape(5, 5))
+        # draw_image(filtered)
 
 
 if __name__ == '__main__':
