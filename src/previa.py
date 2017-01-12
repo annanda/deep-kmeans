@@ -215,13 +215,14 @@ def run():
     # img = unflatten(img_1)
     # label_1 = train_set[100][1]
     # draw_img(img, 'image of train set do tipo {}'.format(label_1))
-    img_file = '../girl-original.png'
+    img_file = '../flower.jpg'
     img = cv2.imread(img_file)
     # img_matplot = plt.imread(img_file)
     img_whitened = whiten_image(img, True)
     # img_whitened_mp = apply_whitening_in_image(img_matplot)
     draw_img(img, 'original')
     draw_img(img_whitened, 'whitened')
+    draw_img(whiten_image(img, is_zca=False), 'whitened pca')
     # normalized = normalize_img(img_2)
     # draw_img(normalized)
     # img_nova = flatten_img(normalized)

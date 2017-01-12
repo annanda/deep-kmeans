@@ -349,8 +349,7 @@ def whiten_channel(channel, is_zca=True):
 
     width, height = channel.shape
 
-    flat_channel = channel.flatten(1)
-    flat_channel = flat_channel.reshape(1, len(flat_channel))
+    flat_channel = channel.reshape(1, channel.size)
     flat_channel = flat_channel.astype('float64')  # Evita problemas de overflow em algumas contas quando se usa int.
 
     if is_zca:
@@ -358,7 +357,7 @@ def whiten_channel(channel, is_zca=True):
     else:
         whitened_flat_channel, _ = pca_whitening(flat_channel)
 
-    whitened_channel = whitened_flat_channel.reshape(width, height).T
+    whitened_channel = whitened_flat_channel.reshape(width, height)
 
     return whitened_channel
 

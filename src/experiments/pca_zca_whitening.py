@@ -45,7 +45,13 @@ def whiten_image(img):
     final_xZCAWhite_r = shapeImageWhitened(xZCAWhite_r, width, height)
 
     img = cv2.merge((final_xZCAWhite_b, final_xZCAWhite_g, final_xZCAWhite_r))
-    showImage(img, 'whitened')
+    showImage(img, 'whitened ZCA')
+    final_xZCAWhite_b = shapeImageWhitened(xPCAWhite_b, width, height)
+    final_xZCAWhite_g = shapeImageWhitened(xPCAWhite_g, width, height)
+    final_xZCAWhite_r = shapeImageWhitened(xPCAWhite_r, width, height)
+    img = cv2.merge((final_xZCAWhite_b, final_xZCAWhite_g, final_xZCAWhite_r))
+    showImage(img, 'whitened PCA')
+
     return img
 
 '''Funcao responsavel por ler a imagem original em tons de cinza, dar resize na mesma e apresenta-la 
@@ -89,9 +95,8 @@ def ZCAWhitening(xPCAWhite, U):
 dos valores da mesma. Todos os valores foram transformados para float, pois quando lidamos com int temos problema 
 de overflow em algumas contas.'''
 def reshapeImage(img):
-    vector = img.flatten(1)
-    x = vector.reshape(1,len(vector))
-    x = x.astype('float64')
+    vector = img.reshape(1, img.size)
+    x = vector.astype('float64')
     return x
 
 '''Funcao responsavel por abrir uma janela do sistema com o titulo escolhido para apresentar a imagem do parametro.'''
@@ -102,8 +107,8 @@ def showImage(img, title):
 '''Funcao responsavel por transformar a matriz ZCAWhite que possui dimensao 1xN*M em uma nova matriz, equivalente a original
 de dimensoes NxM, sem alteracao de seus valores. Apresenta a imagem final caso a opcao seja escolhida.'''
 def shapeImageWhitened(xZCAWhite,width, height):
-    reshaped = xZCAWhite.reshape(height,width)
-    reshaped_t = reshaped.T
+    reshaped = xZCAWhite.reshape(width, height)
+    reshaped_t = reshaped
     # if showImages:
         # showImage(reshaped_t, 'whitened')
         
@@ -111,4 +116,4 @@ def shapeImageWhitened(xZCAWhite,width, height):
     
     
 if __name__ == '__main__':
-    whiten_images(['../../girl-original.png'], True, False)
+    whiten_images(['../../flower.jpg'], True, False)
