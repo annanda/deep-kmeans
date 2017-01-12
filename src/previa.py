@@ -320,24 +320,24 @@ def shapeImageWhitened(xZCAWhite, width, height):
     return reshaped_t
 
 def run():
-    data_files = ['data_batch_1', 'data_batch_2', 'data_batch_3', 'data_batch_4', 'data_batch_5']
-    test_files = ['test_batch']
-    train_set, valid_set, test_set = read_images_from_cifar_10(data_files, test_files)
-    img_2 = test_set[0][0]
-    img_2 = unflatten(img_2)
-    label_2 = test_set[0][1]
-    draw_img(img_2, 'image of test set do tipo {}'.format(label_2))
-    img_1 = train_set[100][0]
-    img = unflatten(img_1)
-    label_1 = train_set[100][1]
-    draw_img(img, 'image of train set do tipo {}'.format(label_1))
-    # img_file = '../girl-original.png'
-    # img = cv2.imread(img_file)
-    # img_matplot = plt.imread(img_file)
-    # img_whitened = apply_whitening_in_image(img, True)
+    # data_files = ['data_batch_1', 'data_batch_2', 'data_batch_3', 'data_batch_4', 'data_batch_5']
+    # test_files = ['test_batch']
+    # train_set, valid_set, test_set = read_images_from_cifar_10(data_files, test_files)
+    # img_2 = test_set[0][0]
+    # img_2 = unflatten(img_2)
+    # label_2 = test_set[0][1]
+    # draw_img(img_2, 'image of test set do tipo {}'.format(label_2))
+    # img_1 = train_set[100][0]
+    # img = unflatten(img_1)
+    # label_1 = train_set[100][1]
+    # draw_img(img, 'image of train set do tipo {}'.format(label_1))
+    img_file = '../girl-original.png'
+    img = cv2.imread(img_file)
+    img_matplot = plt.imread(img_file)
+    img_whitened = apply_whitening_in_image(img, True)
     # img_whitened_mp = apply_whitening_in_image(img_matplot)
-    # draw_img(img, 'original')
-    # draw_img(img_whitened, 'whitened')
+    draw_img(img, 'original')
+    draw_img(img_whitened, 'whitened')
     # normalized = normalize_img(img_2)
     # draw_img(normalized)
     # img_nova = flatten_img(normalized)

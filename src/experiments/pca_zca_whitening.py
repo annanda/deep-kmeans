@@ -1,6 +1,6 @@
+import cv2
 import numpy as np
 from scipy import linalg
-import cv2
 
 # codigo da patricia com alteracoes para aplicar a imagens coloridas.
 ##### Variaveis globais para realizar determinadas acoes #####
@@ -40,10 +40,9 @@ def whiten_image(img):
     xPCAWhite_r, U_r = PCAWhitening(shaped_r)
     xZCAWhite_r = ZCAWhitening(xPCAWhite_r, U_r)
 
-
-    final_xZCAWhite_b = shapeImageWhitened(xPCAWhite_b, width, height)
-    final_xZCAWhite_g = shapeImageWhitened(xPCAWhite_g, width, height)
-    final_xZCAWhite_r = shapeImageWhitened(xPCAWhite_r, width, height)
+    final_xZCAWhite_b = shapeImageWhitened(xZCAWhite_b, width, height)
+    final_xZCAWhite_g = shapeImageWhitened(xZCAWhite_g, width, height)
+    final_xZCAWhite_r = shapeImageWhitened(xZCAWhite_r, width, height)
 
     img = cv2.merge((final_xZCAWhite_b, final_xZCAWhite_g, final_xZCAWhite_r))
     showImage(img, 'whitened')
@@ -112,5 +111,4 @@ def shapeImageWhitened(xZCAWhite,width, height):
     
     
 if __name__ == '__main__':
-
-        whiten_images(['../girl-original.png'], True, False)
+    whiten_images(['../../girl-original.png'], True, False)
