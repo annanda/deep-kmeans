@@ -180,17 +180,6 @@ def unflatten(img_flatten):
     return img
 
 
-def get_label_names(idx):
-    """
-    Return the name of label related to the index number
-    :param idx: indice number that whant to know the label of class
-    :return: label of class
-    """
-    fo = open('../cifar-10/batches.meta', 'rb')
-    lista = cPickle.load(fo)
-    return lista['label_names'][idx]
-
-
 def flatten_img(img):
     b, g, r = cv2.split(img)
     b = b.reshape(1024)

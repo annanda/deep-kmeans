@@ -1,5 +1,4 @@
 from sklearn.cluster import MiniBatchKMeans
-from sklearn.metrics import silhouette_score
 
 from image_utils import *
 
@@ -48,7 +47,7 @@ def run():
 
     # filtering and drawing a image
     filtered = convolve_image(train_set[0][0].reshape(28, 28), centroids[0].reshape(5, 5))
-    draw_img(filtered)
+    draw_image(filtered)
 
 
 if __name__ == '__main__':

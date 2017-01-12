@@ -269,7 +269,7 @@ def get_some_class(list_files, class_name):
     return final_array
 
 
-def draw_img(img, title):
+def draw_image(img, title="image"):
     """
     Draw an image in a resizable window with title
 
@@ -279,6 +279,9 @@ def draw_img(img, title):
     cv2.namedWindow(title, flags=cv2.WINDOW_NORMAL)
     cv2.imshow(title, img)
     cv2.waitKey(0)
+
+    # plt.imshow(img)
+    # plt.show()
 
 
 def convolve_image(img, filter):
@@ -385,3 +388,32 @@ def zca_whitening(x):
     x_pca_white, U = pca_whitening(x)
     x_zca_white = U.dot(x_pca_white)  # formula da ZCAWhitening
     return x_zca_white
+
+
+def get_random_patch_of_image(img, patch_width, patch_height):
+    y = np.random.randint(0, img.shape[0] - patch_height)
+    x = np.random.randint(0, img.shape[1] - patch_width)
+    return img[y:y + patch_height, x:x + patch_width]
+
+
+def get_random_patches_of_image(img, patch_width, patch_height, num_patches):
+    patches = []
+    for i in xrange(num_patches):
+        patches.append(get_random_patch_of_image(img, patch_width, patch_height))
+
+    return np.array(patches)
+
+
+def draw_images_with_matplot(image_matrix):
+    num_lines = image_matrix.shape[0]
+    num_columns = image_matrix.shape[1]
+
+    fig, subs = plt.subplots(num_lines, num_columns)
+    for i in xrange(num_lines):
+        for j in xrange(num_columns):
+            img = image_matrix[i][j]
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            subs[i][j].imshow(img, cmap='Greys_r')
+            subs[i][j].axis('off')
+
+    plt.show()
