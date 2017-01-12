@@ -1,8 +1,10 @@
-import cv2
+# coding=utf-8
 import cPickle
 import gzip
-import numpy as np
+
+import cv2
 import matplotlib.pyplot as plt
+import numpy as np
 from scipy import linalg
 
 
@@ -91,19 +93,19 @@ def read_images_from_cifar_10(data_files, test_files, normalize=True, whitenning
     for img in train_set:
         img_unflatted = unflatten(img[0])
         img_normalized = normalize_img(img_unflatted)
-        img_whitened = apply_whitening_in_image(img_normalized, True)
+        img_whitened = whiten_image(img_normalized, True)
         img[0] = flatten_img(img_whitened)
 
     for img_1 in valid_set:
         img_unflatted = unflatten(img_1[0])
         img_normalized = normalize_img(img_unflatted)
-        img_whitened = apply_whitening_in_image(img_normalized, True)
+        img_whitened = whiten_image(img_normalized, True)
         img_1[0] = flatten_img(img_whitened)
 
     for img_2 in test_set:
         img_unflatted = unflatten(img_2[0])
         img_normalized = normalize_img(img_unflatted)
-        img_whitened = apply_whitening_in_image(img_normalized, True)
+        img_whitened = whiten_image(img_normalized, True)
         img_2[0] = flatten_img(img_whitened)
 
     return train_set, valid_set, test_set
@@ -172,8 +174,8 @@ def sampling_image(img, window_size=(5, 5)):
     :param window_size: a tuple (width, height) with the sample size
     :return: img: numpy array
     """
-    x = np.random.randint(0, img.shape[0]-window_size[0])
-    y = np.random.randint(0, img.shape[1]-window_size[1])
+    x = np.random.randint(0, img.shape[0] - window_size[0])
+    y = np.random.randint(0, img.shape[1] - window_size[1])
     return img[x: x + window_size[0], y: y + window_size[1]].flatten()
 
 
@@ -209,16 +211,16 @@ def draw_multiple_images(images, num_lines, num_columns):
     fig, subs = plt.subplots(num_lines, num_columns)
     for i in xrange(num_lines):
         for j in xrange(num_columns):
-            img = images[i*j]
+            img = images[i * j]
 
             if img_is_flatten:
 
                 width = np.sqrt(img.shape[0])
                 height = np.sqrt(img.shape[0])
-                subs[i][j].imshow(img.reshape(width, height),  cmap='Greys_r')
+                subs[i][j].imshow(img.reshape(width, height), cmap='Greys_r')
 
             else:
-                subs[i][j].imshow(img,  cmap='Greys_r')
+                subs[i][j].imshow(img, cmap='Greys_r')
 
             subs[i][j].axis('off')
 
@@ -322,7 +324,7 @@ def flatten_img(img):
     return np.array(img)
 
 
-def apply_whitening_in_image(img, is_zca=True):
+def whiten_image(img, is_zca=True):
     """
     Apply whitenning ZCA in an image
     :param img: nparray that is the image with three channels
@@ -339,74 +341,48 @@ def apply_whitening_in_image(img, is_zca=True):
     return img
 
 
-'''Funcao responsavel por receber uma imagem e retornar a matriz equivalente a mesma, porem esbranquicada.'''
-
-
 def whiten_channel(channel, is_zca=True):
-    width, height = channel.shape
-    shaped_channel = reshapeImage(channel)
+    """
+    Funcao responsavel por receber uma imagem preto e branco (que também pode ser um canal)
+    e retornar a matriz equivalente a mesma, porem esbranquicada.
+    """
 
-    xPCAWhite, U = PCAWhitening(shaped_channel)
-    xZCAWhite = ZCAWhitening(xPCAWhite, U)
+    width, height = channel.shape
+
+    flat_channel = channel.flatten(1)
+    flat_channel = flat_channel.reshape(1, len(flat_channel))
+    flat_channel = flat_channel.astype('float64')  # Evita problemas de overflow em algumas contas quando se usa int.
 
     if is_zca:
-        return shapeImageWhitened(xZCAWhite, width, height)
-
+        whitened_flat_channel = zca_whitening(flat_channel)
     else:
-        return shapeImageWhitened(xPCAWhite, width, height)
+        whitened_flat_channel, _ = pca_whitening(flat_channel)
+
+    whitened_channel = whitened_flat_channel.reshape(width, height).T
+
+    return whitened_channel
 
 
-'''Funcao responsavel por receber a matriz 2D NxM da imagem e retornar uma nova matriz 1 x N*M, sem alteracao
-dos valores da mesma. Todos os valores foram transformados para float, pois quando lidamos com int temos problema
-de overflow em algumas contas.'''
+def pca_whitening(x):
+    """Funcao responsavel por receber a matriz no formato 1 x N*M de valores float e realizar os passos do
+    algoritmo de branqueamento do PCA. Sao eles: calcular sigma e seus autovalores (matriz U de rotacao, etc),
+    achar xRot (dados rotacionados), xHat(dados em dimensao reduzida 1) e, finalmente, computar a matriz PCA
+    utilizando a formula estabelecida. Retorna a matriz PCA e U."""
 
-
-def reshapeImage(img):
-    vector = img.flatten(1)
-    x = vector.reshape(1, len(vector))
-    x = x.astype('float64')
-    return x
-
-
-'''Funcao responsavel por receber a matriz no formato 1 x N*M de valores float e realizar os passos do
-algoritmo de branqueamento do PCA. Sao eles: calcular sigma e seus autovalores (matriz U de rotacao, etc),
-achar xRot (dados rotacionados), xHat(dados em dimensao reduzida 1) e, finalmente, computar a matriz PCA
-utilizando a formula estabelecida. Retorna a matriz PCA e U.'''
-
-
-def PCAWhitening(x):
     sigma = x.dot(x.T) / x.shape[1]
     U, S, Vh = linalg.svd(sigma)
 
-    xRot = U.T.dot(x)
-
-    # Reduz o numero de dimensoes de 2 pra 1
-    k = 1
-    xRot = U[:, 0:k].T.dot(x)
-    xHat = U[:, 0:k].dot(xRot)
-
     epsilon = 1e-5
-    xPCAWhite = np.diag(1.0 / np.sqrt(S + epsilon)).dot(U.T).dot(x)  # formula do PCAWhitening
-    return xPCAWhite, U
+
+    # noinspection PyTypeChecker
+    x_pca_white = np.diag(1.0 / np.sqrt(S + epsilon)).dot(U.T).dot(x)  # formula do PCAWhitening
+    return x_pca_white, U
 
 
-'''Funcao responsavel por retornar a matriz ZCAWhitening a partir da PCAWhitening e U, atraves
-da formula estabelecida (UxPCAWhite).'''
+def zca_whitening(x):
+    """Funcao responsavel por retornar a matriz ZCAWhitening a partir da PCAWhitening e U, atraves
+    da formula estabelecida (UxPCAWhite)."""
 
-
-def ZCAWhitening(xPCAWhite, U):
-    xZCAWhite = U.dot(xPCAWhite)  # formula da ZCAWhitening
-    return xZCAWhite
-
-
-'''Funcao responsavel por transformar a matriz ZCAWhite que possui dimensao 1xN*M em uma nova matriz, equivalente a original
-de dimensoes NxM, sem alteracao de seus valores. Apresenta a imagem final caso a opcao seja escolhida.'''
-
-
-def shapeImageWhitened(xZCAWhite, width, height):
-    reshaped = xZCAWhite.reshape(height, width)
-    reshaped_t = reshaped.T
-    # if showImages:
-    # showImage(reshaped_t, 'whitened')
-
-    return reshaped_t
+    x_pca_white, U = pca_whitening(x)
+    x_zca_white = U.dot(x_pca_white)  # formula da ZCAWhitening
+    return x_zca_white

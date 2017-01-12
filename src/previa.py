@@ -5,7 +5,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-from image_utils import apply_whitening_in_image
+from image_utils import whiten_image
 
 LABEL_AIRPLANE = 0
 LABEL_AUTOMOBILE = 1
@@ -85,19 +85,19 @@ def read_images_from_cifar_10(data_files, test_files, normalize=True, whitenning
     for img in train_set:
         img_unflatted = unflatten(img[0])
         img_normalized = normalize_img(img_unflatted)
-        img_whitened = apply_whitening_in_image(img_normalized, True)
+        img_whitened = whiten_image(img_normalized, True)
         img[0] = flatten_img(img_whitened)
 
     for img_1 in valid_set:
         img_unflatted = unflatten(img_1[0])
         img_normalized = normalize_img(img_unflatted)
-        img_whitened = apply_whitening_in_image(img_normalized, True)
+        img_whitened = whiten_image(img_normalized, True)
         img_1[0] = flatten_img(img_whitened)
 
     for img_2 in test_set:
         img_unflatted = unflatten(img_2[0])
         img_normalized = normalize_img(img_unflatted)
-        img_whitened = apply_whitening_in_image(img_normalized)
+        img_whitened = whiten_image(img_normalized)
         img_2[0] = flatten_img(img_whitened)
 
     return train_set, valid_set, test_set
@@ -218,7 +218,7 @@ def run():
     img_file = '../girl-original.png'
     img = cv2.imread(img_file)
     # img_matplot = plt.imread(img_file)
-    img_whitened = apply_whitening_in_image(img, True)
+    img_whitened = whiten_image(img, True)
     # img_whitened_mp = apply_whitening_in_image(img_matplot)
     draw_img(img, 'original')
     draw_img(img_whitened, 'whitened')
