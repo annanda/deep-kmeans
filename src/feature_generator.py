@@ -3,26 +3,34 @@ from sklearn.cluster import MiniBatchKMeans
 from image_utils import *
 
 
-def generate_cluster_centroids(data_set, window_size, num_cluster):
+def generate_centroids_from_dataset(data_set, centroids_size, num_centroids):
     """generate a set of centroids from image
 
     :param data_set: a numpy array of images (numpy array)
-    :param window_size: int that will determinate a tuple (width, height) with the sample size
-    :param num_cluster: the number of centroids that will be generated
+    :param centroids_size: int that will determinate a tuple (width, height) with the sample size
+    :param num_centroids: the number of centroids that will be generated
     :return: centroids: numpy array with the k-means generated centroids
     """
 
-    X = np.array(data_set)
-    # y = data_set[1]
+    images = []
+    for data in data_set:
+        flat_image = data[0]
+        image = flat_image.reshape(32, 32, 3)
+        images.append(image)
 
-    # sqrt_num_cluster = int(np.sqrt(num_cluster))
+    # GENERATING PATCHES
+    patches = get_random_patches_of_images(images, patch_width=centroids_size, patch_height=centroids_size,
+                                           num_patches_per_image=10)
 
-    #  GENERATING SAMPLES
-    samples = generate_samples(X, 10000, window_size=(window_size, window_size))
+    data_to_fit = []
+    for patch in patches:
+        flat_patch = patch.flatten()
+        data_to_fit.append(flat_patch)
 
     # FITTING K-MEANS
-    kmeans_model = MiniBatchKMeans(n_clusters=num_cluster, batch_size=100, n_init=10, max_no_improvement=10, verbose=False)
-    kmeans_model.fit(samples)
+    kmeans_model = MiniBatchKMeans(n_clusters=num_centroids, batch_size=100, n_init=10, max_no_improvement=10,
+                                   verbose=True)
+    kmeans_model.fit(data_to_fit)
 
     centroids = kmeans_model.cluster_centers_
 
@@ -36,18 +44,17 @@ def run():
 
     train_set, valid_set, test_set = read_images_from_cifar_10(data_files, test_files)
 
-    window_centroids_size = 15
-    num_cluster = 5
+    # configure aqui!
+    centroids_size = 15
+    num_centroids = 5
 
     # creating centroids from cifar 10
-    centroids = generate_cluster_centroids(train_set, window_centroids_size, num_cluster)
+    centroids = generate_centroids_from_dataset(train_set, centroids_size, num_centroids)
 
     # drawing the grid with centroids
     images = []
     for centroid in centroids:
-        channel = centroid.reshape(window_centroids_size, window_centroids_size)
-        empty_channel = np.zeros(shape=(window_centroids_size, window_centroids_size))
-        image = cv2.merge((empty_channel, channel, empty_channel))
+        image = centroid.reshape(centroids_size, centroids_size, 3)
         images.append(image)
 
         draw_image(image, "Centroid")

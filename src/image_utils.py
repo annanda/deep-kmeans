@@ -140,37 +140,6 @@ def flatten_img(img):
     return np.array(img)
 
 
-def sampling_image(img, window_size=(5, 5)):
-    """
-    Get a sample slice from a image
-
-    :param img: numpy array
-    :param window_size: a tuple (width, height) with the sample size
-    :return: img: numpy array
-    """
-    x = np.random.randint(0, img.shape[0] - window_size[0])
-    y = np.random.randint(0, img.shape[1] - window_size[1])
-    return img[x: x + window_size[0], y: y + window_size[1]].flatten()
-
-
-def generate_samples(data_set, num_samples, window_size=(5, 5)):
-    """
-    From a set of images, generate many samples (slices)
-
-    :param data_set: numpy array with multiple images (each image is a numpy array)
-    :param num_samples: number of samples that must be generated
-    :param window_size: tuple (width, height) with the sample size
-    :return: img: numpy array with multiple image samples
-    """
-    samples = []
-    for i in xrange(num_samples):
-        random_img_posi = np.random.randint(0, len(data_set))
-        img = data_set[random_img_posi][0][0:1024]
-        sample = sampling_image(img.reshape(32, 32), window_size=window_size)
-        samples.append(sample)
-    return np.array(samples)
-
-
 def draw_image(img, title="image"):
     """
     Draw an image in a resizable window with title
@@ -259,6 +228,14 @@ def get_random_patches_of_image(img, patch_width, patch_height, num_patches):
     patches = []
     for i in xrange(num_patches):
         patches.append(get_random_patch_of_image(img, patch_width, patch_height))
+
+    return np.array(patches)
+
+
+def get_random_patches_of_images(images, patch_width, patch_height, num_patches_per_image):
+    patches = []
+    for image in images:
+        patches.extend(get_random_patches_of_image(image, patch_width, patch_height, num_patches_per_image))
 
     return np.array(patches)
 
