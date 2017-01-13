@@ -271,12 +271,29 @@ def draw_images_with_matplot(image_matrix):
     for i in xrange(num_lines):
         for j in xrange(num_columns):
             img = image_matrix[i][j]
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             if num_lines == 1:
                 subs[j].imshow(img, cmap='Greys_r')
                 subs[j].axis('off')
             else:
                 subs[i][j].imshow(img, cmap='Greys_r')
                 subs[i][j].axis('off')
+
+    plt.show()
+
+
+def draw_images_with_matplot_array_images(image_array):
+    num_lines = image_array.shape[0] / 2
+    num_columns = image_array.shape[1]
+
+    fig, subs = plt.subplots(num_lines, num_lines)
+    cont = 0
+    for i in xrange(num_lines):
+        for j in xrange(num_lines):
+            img = image_array[cont]
+            # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            subs[i][j].imshow(img, cmap='Greys_r')
+            subs[i][j].axis('off')
+            cont += 1
 
     plt.show()
