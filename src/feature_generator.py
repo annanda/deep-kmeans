@@ -37,6 +37,18 @@ def generate_centroids_from_dataset(data_set, centroids_size, num_centroids):
     return centroids
 
 
+def apply_convolution_to_dataset_images(dataset, centroids, centroids_size):
+    for data in dataset:
+        image = data[0].reshape(32, 32, 3)
+        convolution_channels = []
+        for centroid in centroids:
+            channel = cv2.filter2D(image, -1, centroid.reshape(centroids_size, centroids_size, 3))
+            convolution_channels.append(channel)
+        data[0] = np.array(convolution_channels)
+
+    return dataset
+
+
 def run():
 
     data_files = ['data_batch_1', 'data_batch_2', 'data_batch_3', 'data_batch_4', 'data_batch_5']
@@ -52,17 +64,19 @@ def run():
     centroids = generate_centroids_from_dataset(train_set, centroids_size, num_centroids)
 
     # drawing the grid with centroids
-    images = []
-    for centroid in centroids:
-        image = centroid.reshape(centroids_size, centroids_size, 3)
-        images.append(image)
+    # images = []
+    # for centroid in centroids:
+    #     image = centroid.reshape(centroids_size, centroids_size, 3)
+    #     images.append(image)
+    #
+    #     draw_image(image, "Centroid")
 
-        draw_image(image, "Centroid")
+    # modify the datasets to contain images convoluted with one channel per centroid
+    train_set = apply_convolution_to_dataset_images(train_set, centroids, centroids_size)
+    valid_set = apply_convolution_to_dataset_images(valid_set, centroids, centroids_size)
+    test_set = apply_convolution_to_dataset_images(test_set, centroids, centroids_size)
 
-    # filtering and drawing a image
-        # filtered = convolve_image(train_set[0][0].reshape(28, 28), centroids[0].reshape(5, 5))
-        # draw_image(filtered)
-
+    np.save("../generated_features", [train_set, valid_set, test_set])
 
 if __name__ == '__main__':
     run()
