@@ -5,6 +5,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import linalg
+from sklearn.cluster import MiniBatchKMeans
 
 LABEL_AIRPLANE = 0
 LABEL_AUTOMOBILE = 1
@@ -274,3 +275,40 @@ def draw_images_with_matplot_array_images(image_array):
             cont += 1
 
     plt.show()
+
+
+def generate_centroids_from_dataset(data_set, centroids_size, num_centroids):
+    """generate a set of centroids from image
+
+    :param data_set: a numpy array of images (numpy array)
+    :param centroids_size: int that will determinate a tuple (width, height) with the sample size
+    :param num_centroids: the number of centroids that will be generated
+    :return: centroids: numpy array with the k-means generated centroids
+    """
+
+    images = []
+    for flat_image in data_set.x:
+        image = flat_image.reshape(32, 32, 3)
+        images.append(image)
+
+    # GENERATING PATCHES
+    patches = get_random_patches_of_images(images, patch_width=centroids_size, patch_height=centroids_size,
+                                           num_patches_per_image=2)
+
+    data_to_fit = []
+    for patch in patches:
+        flat_patch = patch.flatten()
+        data_to_fit.append(flat_patch)
+
+    # FITTING K-MEANS
+    kmeans_model = MiniBatchKMeans(n_clusters=num_centroids,
+                                   batch_size=100,
+                                   n_init=10,
+                                   compute_labels=False,
+                                   max_no_improvement=10,
+                                   verbose=True)
+    kmeans_model.fit(data_to_fit)
+
+    centroids = kmeans_model.cluster_centers_
+
+    return centroids
